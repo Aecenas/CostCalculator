@@ -406,3 +406,14 @@ select {
     align-items: center;
     height: 200px;
 }
+
+.version-info {
+    text-align: center;
+    margin: 10px 0 20px;
+    color: #666;
+    font-size: 14px;
+}
+
+.version-info span {
+    margin: 0 10px;
+}
