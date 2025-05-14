@@ -388,3 +388,21 @@ select {
     align-items: center;
     gap: 10px;
 }
+
+#import-btn, #export-btn {
+    padding: 8px 16px;
+    margin: 10px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.import-export-section {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 200px;
+}

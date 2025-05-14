@@ -380,3 +380,73 @@ document.querySelectorAll('.row-number').forEach(cell => {
         });
     });
 });
+
+// 导出数据功能
+document.getElementById('export-btn').addEventListener('click', function() {
+    try {
+        const data = localStorage.getItem('tradeRecords');
+        if (!data) {
+            alert('没有可导出的数据');
+            return;
+        }
+        
+        const blob = new Blob([data], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `trade_records_${new Date().toISOString().slice(0,10)}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        
+        alert('数据导出成功');
+    } catch (error) {
+        console.error('导出失败:', error);
+        alert('导出失败，请查看控制台');
+    }
+});
+
+// 导入数据功能
+document.getElementById('import-btn').addEventListener('click', function() {
+    document.getElementById('import-file').click();
+});
+
+document.getElementById('import-file').addEventListener('change', function(e) {
+    try {
+        const file = e.target.files[0];
+        if (!file) return;
+        
+        const reader = new FileReader();
+        reader.onload = function(event) {
+            const importedData = event.target.result;
+            // 验证导入数据格式
+            try {
+                const parsedData = JSON.parse(importedData);
+                if (!parsedData.records || !Array.isArray(parsedData.records)) {
+                    throw new Error('无效的数据格式');
+                }
+                
+                // 合并数据
+                const existingData = localStorage.getItem('tradeRecords');
+                let currentData = existingData ? JSON.parse(existingData) : { records: [] };
+                currentData.records = [...currentData.records, ...parsedData.records];
+                
+                // 保存到localStorage
+                localStorage.setItem('tradeRecords', JSON.stringify(currentData));
+                initStockSelector(); // 更新选择器
+                alert(`成功导入 ${parsedData.records.length} 条记录`);
+            } catch (error) {
+                console.error('导入失败:', error);
+                alert('导入失败: 文件格式不正确');
+            }
+        };
+        reader.readAsText(file);
+    } catch (error) {
+        console.error('导入失败:', error);
+        alert('导入失败，请查看控制台');
+    } finally {
+        // 重置文件输入，允许重复选择同一文件
+        e.target.value = '';
+    }
+});

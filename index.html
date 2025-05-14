@@ -12,6 +12,7 @@
             <button class="tab-button active" data-tab="new-trade-record">记录新交易</button>
             <button class="tab-button" data-tab="record-amend">查询/修改历史记录</button>
             <button class="tab-button" data-tab="data-chart">摊薄成本图表</button>
+            <button class="tab-button" data-tab="data-import-export">导入/导出记录</button>
             <button class="tab-button" data-tab="data-clear">清除记录</button>
         </div>
         
@@ -133,6 +134,15 @@
                 <button id="generate-chart">生成图表</button>
             </div>
             <canvas id="cost-chart"></canvas>
+        </div>
+
+        <!-- 导入/导出数据区域 -->
+        <div id="data-import-export" class="tab-content">
+            <div class="import-export-section">
+                <button id="export-btn">导出数据</button>
+                <input type="file" id="import-file" accept=".json" style="display:none">
+                <button id="import-btn">导入数据</button>
+            </div>
         </div>
 
         <!-- 清除记录区域 -->
