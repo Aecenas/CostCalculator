@@ -7,18 +7,40 @@ body {
 }
 
 .calculator {
-    max-width: 100%;  /* 改为100%适应屏幕 */
-    overflow-x: auto; /* 添加横向滚动条 */
+    max-width: 100%;
+    /* 改为100%适应屏幕 */
+    overflow-x: auto;
+    /* 添加横向滚动条 */
     margin: 0 auto;
     background: white;
     padding: 20px;
     border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
 .title {
     text-align: center;
     color: #333;
+}
+
+.row-number {
+    position: relative;
+    text-align: center;
+    font-weight: bold;
+    background-color: #f5f5f5;
+    width: 40px;
+    cursor: pointer;
+}
+
+.row-number:hover::after {
+    content: "❌";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    color: #ff6b6b;
+    font-size: 30px;
+    font-weight: bold;
 }
 
 /* 标签按钮样式 */
@@ -35,12 +57,14 @@ body {
     border: none;
     cursor: pointer;
     transition: 0.3s;
-    color: #555; /* 新增：未激活状态文字颜色 */
+    color: #555;
+    /* 新增：未激活状态文字颜色 */
 }
 
 .tab-button:hover {
     background: #ddd;
-    color: #333; /* 新增：悬停时文字颜色加深 */
+    color: #333;
+    /* 新增：悬停时文字颜色加深 */
 }
 
 .tab-button.active {
@@ -68,32 +92,36 @@ table {
 
 #trade-table th:nth-child(1),
 #trade-table td:nth-child(1) {
-    width: 8%;
+    width: 2%;
 }
+
 #trade-table th:nth-child(2),
 #trade-table td:nth-child(2) {
     width: 5%;
 }
+
 #trade-table th:nth-child(3),
 #trade-table td:nth-child(3) {
-    width: 3%;
-}
-
-#trade-table th:nth-child(4),
-#trade-table td:nth-child(4),
-#trade-table th:nth-child(5),
-#trade-table td:nth-child(5) {
     width: 5%;
 }
 
-#trade-table th:nth-child(6),
-#trade-table td:nth-child(6) {
-    width: 3%;
+#trade-table th:nth-child(4),
+#trade-table td:nth-child(4) {
+    width: 8%;
 }
 
-/* 日期列 - 10%宽度 */
+#trade-table th:nth-child(5),
+#trade-table td:nth-child(5),
+#trade-table th:nth-child(6),
+#trade-table td:nth-child(6) {
+    width: 5%;
+}
+
 #trade-table th:nth-child(7),
-#trade-table td:nth-child(7),
+#trade-table td:nth-child(7) {
+    width: 5%;
+}
+
 #trade-table th:nth-child(8),
 #trade-table td:nth-child(8),
 #trade-table th:nth-child(9),
@@ -105,9 +133,56 @@ table {
     width: 5%;
 }
 
-
 #trade-table th:nth-child(12),
 #trade-table td:nth-child(12) {
+    width: 15%;
+}
+
+#amend-table th:nth-child(1),
+#amend-table td:nth-child(1) {
+    width: 2%;
+}
+
+#amend-table th:nth-child(2),
+#amend-table td:nth-child(2) {
+    width: 5%;
+}
+
+#amend-table th:nth-child(3),
+#amend-table td:nth-child(3) {
+    width: 5%;
+}
+
+#amend-table th:nth-child(4),
+#amend-table td:nth-child(4) {
+    width: 8%;
+}
+
+#amend-table th:nth-child(5),
+#amend-table td:nth-child(5),
+#amend-table th:nth-child(6),
+#amend-table td:nth-child(6) {
+    width: 5%;
+}
+
+#amend-table th:nth-child(7),
+#amend-table td:nth-child(7) {
+    width: 5%;
+}
+
+#amend-table th:nth-child(8),
+#amend-table td:nth-child(8),
+#amend-table th:nth-child(9),
+#amend-table td:nth-child(9),
+#amend-table th:nth-child(10),
+#amend-table td:nth-child(10),
+#amend-table th:nth-child(11),
+#amend-table td:nth-child(11) {
+    width: 5%;
+}
+
+#amend-table th:nth-child(12),
+#amend-table td:nth-child(12) {
     width: 15%;
 }
 
@@ -116,22 +191,50 @@ th {
     background-color: #f2f2f2;
     white-space: normal;
     overflow: hidden;
-    text-overflow: ellipsis; /* 超出显示省略号 */
+    text-overflow: ellipsis;
+    /* 超出显示省略号 */
 }
 
 /* 数据单元格 */
-td {
+#trade-table td {
     border: 1px solid #ddd;
     padding: 8px;
     text-align: left;
-    max-width: 150px; /* 设置单元格最大宽度 */
     overflow: hidden;
     text-overflow: ellipsis;
+}
+
+/* 输入框和下拉菜单在单元格内的对齐方式 */
+#trade-table td input,
+#trade-table td select {
+    text-align: inherit;
+    margin: 0 auto;
+    display: block;
+}
+
+/* 第一列和最后一列保持左对齐 */
+#trade-table td:first-child {
+    text-align: center;
+}
+
+input,
+select {
+    width: 100%;
+    padding: 6px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-sizing: border-box;
 }
 
 /* 保持原有样式 */
 th {
     background-color: #f2f2f2;
+}
+
+.result-text {
+    margin-left: 10px;
+    color: #2196F3;
+    font-weight: bold;
 }
 
 /* 按钮样式 */
@@ -150,12 +253,15 @@ button:hover {
 }
 
 /* 输入框样式 */
-input, select {
+input,
+select {
     padding: 6px;
     border: 1px solid #ddd;
     border-radius: 4px;
-    max-width: 100%;  /* 新增：限制最大宽度为父容器宽度 */
-    box-sizing: border-box; /* 新增：确保padding和border包含在宽度内 */
+    max-width: 100%;
+    /* 新增：限制最大宽度为父容器宽度 */
+    box-sizing: border-box;
+    /* 新增：确保padding和border包含在宽度内 */
 }
 
 /* 图表区域样式 */
@@ -187,4 +293,98 @@ input, select {
 /* 选中状态样式 */
 .yn-checkbox:checked {
     accent-color: #4CAF50;
+}
+
+.delete-row-section {
+    margin-top: 10px;
+    display: flex;
+    gap: 5px;
+}
+
+#row-to-delete {
+    width: 80px;
+    padding: 5px;
+}
+
+#delete-row {
+    padding: 5px 10px;
+    background-color: #ff6b6b;
+    color: white;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+#delete-row:hover {
+    background-color: #ff5252;
+}
+
+.delete-row-group {
+    display: flex;
+    gap: 5px;
+    align-items: center;
+}
+
+.search-section {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.search-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.stock-select {
+    width: 200px; /* 控制下拉框宽度 */
+}
+
+.date-input {
+    width: 150px; /* 控制日期输入框宽度 */
+}
+
+.search-label {
+    min-width: 60px; /* 保证标签对齐 */
+}
+.search-section input {
+    width: auto;
+    flex: 1;
+    max-width: 200px;
+}
+
+.search-section button {
+    margin-left: 0;
+}
+
+.search-result-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.vertical-spacer {
+    height: 20px;
+    margin: 10px 0;
+}
+
+.search-label {
+    font-size: 14px;
+    margin-bottom: 5px;
+    color: #333;
+    font-weight: bold;
+}
+#confirm-input {
+    width: 200px;  /* 固定宽度 */
+    margin: 10px 0;  /* 上下边距 */
+    padding: 5px;
+}
+
+.clear-warning {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
 }
