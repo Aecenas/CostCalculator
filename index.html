@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>摊薄成本记账本</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="calculator">
+        <h1 class="title">摊薄成本记账本</h1>
+        
+        <div class="button-group">
+            <button class="tab-button active" data-tab="new-trade-record">记录新交易</button>
+            <button class="tab-button" data-tab="record-amend">修改历史记录</button>
+            <button class="tab-button" data-tab="data-chart">摊薄成本图表</button>
+            <button class="tab-button" data-tab="data-clear">清除记录</button>
+        </div>
+        
+        <!-- 记录新交易区域 -->
+        <div id="new-trade-record" class="tab-content active">
+            <table id="trade-table">
+                <thead>
+                    <tr>
+                        <th>标的名</th>
+                        <th>操作日期</th>
+                        <th>买入标的</th>
+                        <th>买入价</th>
+                        <th>买入数量</th>
+                        <th>卖出标的</th>
+                        <th>卖出价</th>
+                        <th>卖出数量</th>
+                        <th>买期权损益</th>
+                        <th>卖期权损益</th>
+                        <th>手续费</th>
+                        <th>备注</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><input type="text"></td>
+                        <td><input type="date"></td>
+                        <td>
+                            <input type="checkbox" class="yn-checkbox">
+                        </td>
+                        <td><input type="number" value="0" min="0" step="0.01"></td>
+                        <td><input type="number" value="0" min="0"></td>
+                        <td>
+                            <input type="checkbox" class="yn-checkbox">
+                        </td>
+                        <td><input type="number" value="0" min="0" step="0.01"></td>
+                        <td><input type="number" value="0" min="0"></td>
+                        <td><input type="number" value="0" step="0.01"></td>
+                        <td><input type="number" value="0" step="0.01"></td>
+                        <td><input type="number" value="0" step="0.01"></td>
+                        <td><input type="text" placeholder="说明"></td>
+                    </tr>
+                </tbody>
+            </table>
+            <button id="add-row">+ 添加行</button>
+            <button id="save-record">保存记录</button>
+        </div>
+        
+        <!-- 修改历史记录区域 -->
+        <div id="record-amend" class="tab-content">
+            <div class="search-section">
+                <input type="text" id="search-name" placeholder="标的名">
+                <input type="date" id="search-date" placeholder="操作日期">
+                <button id="search-btn">查询</button>
+            </div>
+            <table id="amend-table">
+                <thead>
+                    <tr>
+                        <th>选择</th>
+                        <th>标的名</th>
+                        <th>操作日期</th>
+                        <th>买入标的</th>
+                        <th>买入价</th>
+                        <th>买入数量</th>
+                        <th>卖出标的</th>
+                        <th>卖出价</th>
+                        <th>卖出数量</th>
+                        <th>买期权损益</th>
+                        <th>卖期权损益</th>
+                        <th>手续费</th>
+                        <th>备注</th>
+                    </tr>
+                </thead>
+                <tbody id="amend-tbody"></tbody>
+            </table>
+            <button id="save-amend">保存修改</button>
+            <button id="delete-selected">删除选中</button>
+        </div>
+
+        <!-- 图表区域 -->
+        <div id="data-chart" class="tab-content">
+            <div class="chart-controls">
+                <select id="stock-selector"></select>
+                <button id="generate-chart">生成图表</button>
+            </div>
+            <canvas id="cost-chart"></canvas>
+        </div>
+
+        <!-- 清除记录区域 -->
+        <div id="data-clear" class="tab-content">
+            <div class="clear-warning">
+                <p>这将永久删除所有记录数据！</p>
+                <input type="text" id="confirm-input" placeholder="输入'确认'继续">
+                <button id="clear-btn" disabled>清除所有记录</button>
+            </div>
+        </div>
+    </div>
+    <script src="app.js"></script>
+</body>
+</html>
