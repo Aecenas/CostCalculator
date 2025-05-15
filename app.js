@@ -39,8 +39,13 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('confirm-input').addEventListener('input', toggleClearButton);
     document.getElementById('clear-btn').addEventListener('click', clearAllRecords);
 
+    // 在DOMContentLoaded事件监听器中添加
+    document.getElementById('save-chart-image').addEventListener('click', saveChartImage);
+
     // 添加初始化标的选择器
     initStockSelector();
+    // 初始化图表选择器
+    initChartStockSelector();
 });
 
 // 添加新行函数
@@ -126,6 +131,7 @@ function saveRecord() {
         // 保存到localStorage
         localStorage.setItem('tradeRecords', JSON.stringify(data));
         initStockSelector(); // 保存后更新选择器
+        initChartStockSelector();
         alert('记录保存成功!');
     } catch (error) {
         console.error('保存失败:', error);
@@ -159,6 +165,14 @@ function searchRecords(showFlag = true) {
             }
             
             return nameMatch && dateMatch;
+        }).sort((a, b) => {
+            // 没有日期的记录排在最前面
+            if (!a.date && !b.date) return 0;
+            if (!a.date) return -1;
+            if (!b.date) return 1;
+            
+            // 有日期的记录按从早到晚排序
+            return new Date(a.date) - new Date(b.date);
         });
         
         // 填充表格(改为可编辑形式)
@@ -231,7 +245,7 @@ function saveAmend() {
         });
 
         if (checkedRecords.length === 0) {
-            alert('请至少选择一条记录进行修改');
+            alert('请至少勾选一条记录进行修改');
             return;
         }
 
@@ -280,7 +294,7 @@ function deleteSelected() {
         });
 
         if (checkedIds.length === 0) {
-            alert('请至少选择一条记录进行删除');
+            alert('请至少勾选一条记录进行删除');
             return;
         }
 
@@ -309,7 +323,169 @@ function deleteSelected() {
 
 // 生成图表函数
 function generateChart() {
-    // ... 实现生成图表的逻辑 ...
+    // 注册datalabels插件
+    Chart.register(ChartDataLabels);
+    
+    const selectedStock = document.getElementById('stock-selector').value;
+    if (!selectedStock) {
+        alert('请选择要生成图表的标的');
+        return;
+    }
+
+    const data = JSON.parse(localStorage.getItem('tradeRecords')) || { records: [] };
+    const stockRecords = data.records.filter(record => record.name === selectedStock)
+                                     .sort((a, b) => {
+                                         // 没有日期的记录排在最前面
+                                         if (!a.date && !b.date) return 0;
+                                         if (!a.date) return -1;
+                                         if (!b.date) return 1;
+                                         
+                                         // 有日期的记录按从早到晚排序
+                                         return new Date(a.date) - new Date(b.date);
+                                     });
+
+    if (stockRecords.length === 0) {
+        alert('没有找到该标的的交易记录');
+        return;
+    }
+
+    // 如果spot_buy和spot_sell的记录没有日期，则把它们的日期赋成stockRecords里最早的一天日期
+    const firstTradeDate = stockRecords.find(record => record.type ==='spot_buy' || record.type ==='spot_sell').date;
+    stockRecords.forEach(record => {
+        if (record.type ==='spot_buy' || record.type ==='spot_sell') {
+            if (!record.date) {
+                record.date = firstTradeDate;
+            }
+        }
+    });
+
+    // 找到第一次买入的索引
+    const firstBuyIndex = stockRecords.findIndex(r => r.type === 'spot_buy');
+    if (firstBuyIndex === -1) {
+        alert('该标的没有买入记录，无法计算摊薄成本');
+        return;
+    }
+
+    // 计算第一次买入前的期权损益总和
+    const initialOptionProfit = stockRecords.slice(0, firstBuyIndex).reduce((sum, record) => {
+        return sum + (record.optionBuyProfit || 0) + (record.optionSellProfit || 0) - (record.fee || 0);
+    }, 0);
+
+    // 只保留第一次买入及之后的记录
+    const validRecords = stockRecords.slice(firstBuyIndex);
+    
+    // 计算累计成本和平均成本
+    let totalCost = -initialOptionProfit; // 初始值为第一次买入前的期权损益总和
+    let totalShares = 0;
+    let lastAvgCost = 0;
+    const chartData = [];
+    
+    validRecords.forEach(record => {
+        if (record.type === 'spot_buy') {
+            totalCost += record.buyPrice * record.buyQuantity;
+            totalShares += record.buyQuantity;
+            // 考虑期权损益
+            totalCost -= (record.optionBuyProfit || 0) + (record.optionSellProfit || 0) - (record.fee || 0);
+        } else if (record.type === 'spot_sell') {
+            totalCost -= record.sellPrice * record.sellQuantity;
+            totalShares -= record.sellQuantity;
+             // 考虑期权损益
+            totalCost -= (record.optionBuyProfit || 0) + (record.optionSellProfit || 0) - (record.fee || 0);
+        } else if (record.type === 'option-buy-sell') {
+            // 只处理期权结算
+            totalCost -= (record.optionBuyProfit || 0) + (record.optionSellProfit || 0) - (record.fee || 0);
+        }
+        
+        // 计算当前摊薄成本
+        const currentAvgCost = totalShares > 0 ? (totalCost / totalShares) : lastAvgCost;
+        lastAvgCost = currentAvgCost;
+        
+        chartData.push({
+            date: record.date,
+            avgCost: parseFloat(currentAvgCost.toFixed(2)),
+            totalShares: totalShares
+        });
+    });
+
+    // 使用Chart.js绘制图表
+    const ctx = document.getElementById('cost-chart').getContext('2d');
+    const chartSize = (document.getElementById('chart-size').value || 80) * 1500 / 100; // 将百分比转换为像素值(80%默认值)
+    const container = document.querySelector('.chart-container');
+    container.style.width = `${chartSize}px`;
+    container.style.height = `${chartSize * 0.5625}px`; // 保持16:9宽高比
+    
+    // 销毁现有图表实例（如果存在）
+    if (window.myChart) {
+        window.myChart.destroy();
+    }
+    
+    // 创建新图表实例并保存引用
+    window.myChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: chartData.map(d => d.date),
+            datasets: [
+                {
+                    label: '摊薄成本',
+                    data: chartData.map(d => d.avgCost),
+                    borderColor: 'rgb(75, 192, 192)',
+                    tension: 0.1,
+                    yAxisID: 'y'
+                },
+                {
+                    label: '总持仓量',
+                    data: chartData.map(d => d.totalShares),
+                    borderColor: 'rgb(255, 99, 132)',
+                    tension: 0.1,
+                    yAxisID: 'y1',
+                    hidden: !document.getElementById('show-shares-checkbox').checked
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                datalabels: {
+                    display: document.getElementById('show-value-checkbox').checked,
+                    align: 'top',
+                    anchor: 'center',
+                    formatter: (value, context) => {
+                        return context.datasetIndex === 0 ? value.toFixed(2) : value;
+                    },
+                    color: '#666',
+                    font: {
+                        weight: 'bold'
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    type: 'linear',
+                    display: true,
+                    position: 'left',
+                    title: {
+                        display: true,
+                        text: '摊薄成本'
+                    },
+                    suggestedMax: Math.max(...chartData.map(d => d.avgCost)) * 1.05 // 增加5%高度
+                },
+                y1: {
+                    type: 'linear',
+                    display: true,
+                    position: 'right',
+                    title: {
+                        display: true,
+                        text: '总持仓量'
+                    },
+                    suggestedMax: Math.max(...chartData.map(d => d.totalShares)) * 1.05, // 增加5%高度
+                    grid: {
+                        drawOnChartArea: false
+                    }
+                }
+            }
+        }
+    });
 }
 
 // 切换清除按钮状态
@@ -354,6 +530,24 @@ function initStockSelector() {
     const selector = document.getElementById('search-name');
     
     // 清空现有选项（保留第一个"请选择"选项）
+    selector.innerHTML = '<option value="">-- 请选择 --</option>';
+    
+    stockNames.forEach(name => {
+        if (name) {
+            const option = document.createElement('option');
+            option.value = name;
+            option.textContent = name;
+            selector.appendChild(option);
+        }
+    });
+}
+
+// 初始化标的选择器
+function initChartStockSelector() {
+    const data = JSON.parse(localStorage.getItem('tradeRecords')) || { records: [] };
+    const stockNames = [...new Set(data.records.map(record => record.name))];
+    const selector = document.getElementById('stock-selector');
+    
     selector.innerHTML = '<option value="">-- 请选择 --</option>';
     
     stockNames.forEach(name => {
@@ -435,6 +629,7 @@ document.getElementById('import-file').addEventListener('change', function(e) {
                 // 保存到localStorage
                 localStorage.setItem('tradeRecords', JSON.stringify(currentData));
                 initStockSelector(); // 更新选择器
+                initChartStockSelector();
                 alert(`成功导入 ${parsedData.records.length} 条记录`);
             } catch (error) {
                 console.error('导入失败:', error);
@@ -450,3 +645,16 @@ document.getElementById('import-file').addEventListener('change', function(e) {
         e.target.value = '';
     }
 });
+
+// 添加保存图片函数
+function saveChartImage() {
+    if (!window.myChart) {
+        alert('请先生成图表');
+        return;
+    }
+    
+    const link = document.createElement('a');
+    link.download = '摊薄成本图表.png';
+    link.href = document.getElementById('cost-chart').toDataURL('image/png');
+    link.click();
+}

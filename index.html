@@ -3,6 +3,8 @@
 <head>
     <title>摊薄成本记账本</title>
     <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
 </head>
 <body>
     <div class="calculator">
@@ -133,11 +135,32 @@
 
         <!-- 图表区域 -->
         <div id="data-chart" class="tab-content">
-            <div class="chart-controls">
-                <select id="stock-selector"></select>
-                <button id="generate-chart">生成图表</button>
+            <div class="chart-control-row">
+                <div class="search-label"><span>标的名:</span></div>
+                <select id="stock-selector" class="stock-select"></select>
+                <div class="chart-control">
+                    <span>图表大小:</span>
+                    <input type="number" id="chart-size" min="50" max="100" value="80" step="10">
+                    <span>%</span>
+                </div>
+                <div class="show-value-control">
+                    <input type="checkbox" id="show-value-checkbox" checked>
+                    <label for="show-value-checkbox">曲线点显示y轴数值</label>
+                </div>
+                <div class="show-shares-control">
+                    <input type="checkbox" id="show-shares-checkbox" checked>
+                    <label for="show-shares-checkbox">显示总持仓量</label>
+                </div>
             </div>
-            <canvas id="cost-chart"></canvas>
+            <div class="vertical-spacer"></div>
+            <div class="chart-button-group">
+                <button id="generate-chart" class="chart-button">生成图表</button>
+                <button id="save-chart-image" class="chart-button">保存图片</button>
+            </div>
+            <div class="vertical-spacer"></div>
+            <div class="chart-container">
+                <canvas id="cost-chart"></canvas>
+            </div>
         </div>
 
         <!-- 导入/导出数据区域 -->

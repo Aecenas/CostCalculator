@@ -266,12 +266,36 @@ select {
 
 /* 图表区域样式 */
 .chart-controls {
-    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.chart-selector {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* 复用查询区域的样式 */
+.chart-controls .stock-select {
+    width: 200px;
+}
+
+.chart-container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    position: relative;
+    aspect-ratio: 16/9;
 }
 
 #cost-chart {
     width: 100%;
-    height: 400px;
+    height: 100%;
+    aspect-ratio: 16/9;
+    margin: 0 auto;
 }
 
 /* 清除记录警告样式 */
@@ -416,4 +440,56 @@ select {
 
 .version-info span {
     margin: 0 10px;
+}
+.chart-control {
+    display: inline-block;
+    margin-left: 20px;
+    vertical-align: middle;
+}
+
+.chart-control input[type="number"] {
+    width: 60px;
+    margin: 0 10px;
+    padding: 5px;
+}
+
+#size-value {
+    display: inline-block;
+    width: 30px;
+    text-align: center;
+}
+.chart-control-row {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+.show-value-control {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-left: 15px;
+    white-space: nowrap; /* 添加这行防止文字换行 */
+}
+
+.show-value-control label {
+    margin: 0; /* 移除默认的label边距 */
+    padding: 0 5px; /* 添加少量内边距 */
+}
+
+.show-shares-control {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-left: 15px;
+    white-space: nowrap;
+}
+
+.show-shares-control label {
+    margin: 0;
+    padding: 0 5px;
+}
+.chart-button-group {
+    display: flex;
+    gap: 10px;
 }
