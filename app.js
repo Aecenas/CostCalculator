@@ -395,16 +395,24 @@ function generateChart() {
             // 只处理期权结算
             totalCost -= (record.optionBuyProfit || 0) + (record.optionSellProfit || 0) - (record.fee || 0);
         }
-        
         // 计算当前摊薄成本
         const currentAvgCost = totalShares > 0 ? (totalCost / totalShares) : lastAvgCost;
         lastAvgCost = currentAvgCost;
-        
-        chartData.push({
-            date: record.date,
-            avgCost: parseFloat(currentAvgCost.toFixed(2)),
-            totalShares: totalShares
-        });
+
+        // 如果chartData已经存在date===record.date的数据了，说明同一天内，有多条记录，需要合并
+        const existingIndex = chartData.findIndex(d => d.date === record.date);
+        if (existingIndex !== -1) {
+            // 合并数据
+            chartData[existingIndex].totalShares = totalShares;
+            chartData[existingIndex].avgCost = parseFloat(currentAvgCost.toFixed(2));
+        } else {
+            // 直接添加新数据
+            chartData.push({
+                date: record.date,
+                avgCost: parseFloat(currentAvgCost.toFixed(2)),
+                totalShares: totalShares
+            });
+        }
     });
 
     // 使用Chart.js绘制图表

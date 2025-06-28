@@ -1,19 +1,21 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>摊薄成本记账本</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
 </head>
+
 <body>
     <div class="calculator">
         <h1 class="title">摊薄成本记账本</h1>
         <div class="version-info">
-            <span>版本: V1.0</span>
+            <span>版本: V1.1</span>
             <span>作者: Ain</span>
         </div>
-        
+
         <div class="button-group">
             <button class="tab-button active" data-tab="new-trade-record">记录新交易</button>
             <button class="tab-button" data-tab="record-amend">查询/修改历史记录</button>
@@ -21,7 +23,7 @@
             <button class="tab-button" data-tab="data-import-export">导入/导出记录</button>
             <button class="tab-button" data-tab="data-clear">清除记录</button>
         </div>
-        
+
         <!-- 记录新交易区域 -->
         <div id="new-trade-record" class="tab-content active">
             <table id="trade-table">
@@ -67,7 +69,7 @@
             <button id="add-row">+ 添加行</button>
             <button id="save-record">保存记录</button>
         </div>
-        
+
         <!-- 查询/修改历史记录区域 -->
         <div id="record-amend" class="tab-content">
             <div class="search-section">
@@ -183,4 +185,5 @@
     </div>
     <script src="app.js"></script>
 </body>
+
 </html>
